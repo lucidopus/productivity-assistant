@@ -2,26 +2,24 @@
   "name": "productivity-assistant",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.3"
+    "dev": "npm run dev --workspace=@productivity-assistant/frontend",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspace=@productivity-assistant/frontend",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "install-all": "npm install && npm install --workspaces"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@trigger.dev/build": "^4.0.2",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.3",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@smithery/cli": "^1.3.0",
+    "@trigger.dev/sdk": "^4.0.2"
   }
 }

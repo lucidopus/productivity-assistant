@@ -1,0 +1,10 @@
+// Dashboard component exports for easy importing
+export { PersonalInfoCard } from './PersonalInfoCard'
+export { ProfessionalInfoCard } from './ProfessionalInfoCard'
+export { ScheduleCard } from './ScheduleCard'
+export { WorkStyleCard } from './WorkStyleCard'
+export { WellnessCard } from './WellnessCard'
+export { CommitmentsCard } from './CommitmentsCard'
+export { DashboardHeader } from './DashboardHeader'
+export { OverviewStats } from './OverviewStats'
+export { QuickActions } from './QuickActions'
