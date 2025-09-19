@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { ProgressBar } from './ProgressBar'
 import { WelcomeScreen } from './WelcomeScreen'
@@ -25,59 +25,59 @@ const ONBOARDING_STEPS = [
 ]
 
 export function MultiStepForm() {
-  const { progress, setCurrentStep, markStepCompleted } = useOnboardingStore()
+  const { progress, setCurrentStep, setProgress, loadProfile } = useOnboardingStore()
   const [showWelcome, setShowWelcome] = useState(true)
 
-  const currentStepData = ONBOARDING_STEPS.map(step => ({
+  // Initialize progress if it's null
+  useEffect(() => {
+    if (!progress) {
+      // Try to load existing profile first
+      loadProfile().then(() => {
+        // If still no progress after loading, initialize with default
+        const currentProgress = useOnboardingStore.getState().progress
+        if (!currentProgress) {
+          setProgress({
+            currentStep: 1,
+            completedSteps: [],
+            isComplete: false,
+            startedAt: new Date(),
+            lastUpdatedAt: new Date(),
+          })
+        }
+      })
+    }
+  }, [progress, loadProfile, setProgress])
+
+  const currentStepData = ONBOARDING_STEPS.map((step, index) => ({
     ...step,
-    completed: progress.completedSteps.includes(step.id)
+    completed: progress?.completedSteps?.includes(index + 1) || false
   }))
 
   const handleGetStarted = () => {
     setShowWelcome(false)
-    setCurrentStep(0)
-    markStepCompleted('welcome')
+    setCurrentStep(1) // Start with step 1 (1-based indexing)
   }
 
   const handleNext = () => {
-    const nextStep = progress.currentStep + 1
-    if (nextStep < ONBOARDING_STEPS.length - 1) {
+    const currentStep = progress?.currentStep || 1
+    const nextStep = currentStep + 1
+    if (nextStep <= 6) { // Steps 1-6
       setCurrentStep(nextStep)
-      markStepCompleted(ONBOARDING_STEPS[progress.currentStep].id)
     }
   }
 
   const handlePrevious = () => {
-    const prevStep = progress.currentStep - 1
-    if (prevStep >= 0) {
+    const currentStep = progress?.currentStep || 1
+    const prevStep = currentStep - 1
+    if (prevStep >= 1) { // Minimum step is 1
       setCurrentStep(prevStep)
     }
   }
 
   const handleComplete = async () => {
-    markStepCompleted(ONBOARDING_STEPS[progress.currentStep].id)
-
-    // Here you would typically save to the backend
-    try {
-      const response = await fetch('/api/onboarding/complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(progress.formData),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to save profile')
-      }
-
-      // Move to completion step (step 6, which is index 6)
-      setCurrentStep(6)
-    } catch (error) {
-      console.error('Error saving profile:', error)
-      // Still show completion even if save fails
-      setCurrentStep(6)
-    }
+    // All individual steps have already been saved via updateFormSection
+    // Just mark onboarding as complete and show completion step
+    setCurrentStep(7) // Completion step
   }
 
   if (showWelcome) {
@@ -87,16 +87,16 @@ export function MultiStepForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 p-4">
       <div className="max-w-4xl mx-auto py-8">
-        {progress.currentStep < 6 && (
+        {(progress?.currentStep || 1) < 7 && (
           <ProgressBar
-            currentStep={progress.currentStep}
-            totalSteps={6} // 6 actual form steps (0-5)
+            currentStep={progress?.currentStep || 1}
+            totalSteps={6} // 6 actual form steps (1-6)
             steps={currentStepData.slice(1, -1)} // Exclude welcome and complete from progress
           />
         )}
 
         <AnimatePresence mode="wait">
-          {progress.currentStep === 0 && (
+          {(progress?.currentStep || 1) === 1 && (
             <PersonalInfoStep
               key="personal"
               onNext={handleNext}
@@ -105,7 +105,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 1 && (
+          {(progress?.currentStep || 1) === 2 && (
             <ProfessionalInfoStep
               key="professional"
               onNext={handleNext}
@@ -113,7 +113,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 2 && (
+          {(progress?.currentStep || 1) === 3 && (
             <ScheduleInfoStep
               key="schedule"
               onNext={handleNext}
@@ -121,7 +121,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 3 && (
+          {(progress?.currentStep || 1) === 4 && (
             <WorkStyleStep
               key="workstyle"
               onNext={handleNext}
@@ -129,7 +129,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 4 && (
+          {(progress?.currentStep || 1) === 5 && (
             <WellnessStep
               key="wellness"
               onNext={handleNext}
@@ -137,7 +137,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 5 && (
+          {(progress?.currentStep || 1) === 6 && (
             <CommitmentsStep
               key="commitments"
               onNext={handleComplete}
@@ -146,7 +146,7 @@ export function MultiStepForm() {
             />
           )}
 
-          {progress.currentStep === 6 && (
+          {(progress?.currentStep || 1) === 7 && (
             <CompletionStep key="complete" />
           )}
         </AnimatePresence>

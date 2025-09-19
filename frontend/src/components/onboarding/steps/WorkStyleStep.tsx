@@ -50,9 +50,9 @@ const focusDurationOptions = [
 ]
 
 export function WorkStyleStep({ onNext, onPrevious }: WorkStyleStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
 
-  const defaultValues = progress.formData.workStyle || {
+  const defaultValues = currentFormData?.workStyle || {
     planningPreference: 'mixed' as const,
     focusDuration: '60',
     taskPreferences: [],
@@ -77,7 +77,7 @@ export function WorkStyleStep({ onNext, onPrevious }: WorkStyleStepProps) {
   const selectedBlockers = watch('blockers') || []
 
   const onSubmit = (data: WorkStyleData) => {
-    updateFormSection('workStyle', data)
+    updateFormSection('workStyle', data, 4)
     onNext()
   }
 

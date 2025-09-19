@@ -1,13 +1,13 @@
 'use client'
 
-import { useForm, useFieldArray } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { professionalInfoSchema } from '@/lib/validations'
 import { StepContainer } from '../StepContainer'
 import { cn } from '@/lib/utils'
 import { Plus, X } from 'lucide-react'
 import { z } from 'zod'
+import { useState } from 'react'
 
 type ProfessionalInfoData = z.infer<typeof professionalInfoSchema>
 
@@ -30,53 +30,55 @@ const workLocationOptions = [
 ]
 
 export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { updateFormSection } = useOnboardingStore()
+
+  // Simple state management for arrays
+  const [shortTermGoals, setShortTermGoals] = useState<string[]>([''])
+  const [longTermGoals, setLongTermGoals] = useState<string[]>([''])
+  const [skillsToLearn, setSkillsToLearn] = useState<string[]>([''])
 
   const {
     register,
     handleSubmit,
     watch,
-    control,
-    formState: { errors, isValid }
+    formState: { errors }
   } = useForm<ProfessionalInfoData>({
-    resolver: zodResolver(professionalInfoSchema),
-    defaultValues: progress.formData.professional || {
-      status: 'student',
-      workLocation: 'remote',
-      goals: { shortTerm: [''], longTerm: [''], skillsDevelopment: [''] }
-    },
-    mode: 'onChange'
-  })
-
-  const { fields: shortTermFields, append: appendShortTerm, remove: removeShortTerm } = useFieldArray({
-    control,
-    name: 'goals.shortTerm'
-  })
-
-  const { fields: longTermFields, append: appendLongTerm, remove: removeLongTerm } = useFieldArray({
-    control,
-    name: 'goals.longTerm'
-  })
-
-  const { fields: skillsFields, append: appendSkill, remove: removeSkill } = useFieldArray({
-    control,
-    name: 'goals.skillsDevelopment'
+    mode: 'onChange',
+    defaultValues: {
+      status: 'student' as const,
+      workLocation: 'remote' as const,
+      organization: '',
+      role: '',
+      experience: 0,
+      goals: {
+        shortTerm: [''] as string[],
+        longTerm: [''] as string[],
+        skillsDevelopment: [''] as string[]
+      }
+    }
   })
 
   const currentStatus = watch('status')
 
   const onSubmit = (data: ProfessionalInfoData) => {
-    // Filter out empty goals
-    const cleanedData = {
-      ...data,
-      goals: {
-        shortTerm: data.goals.shortTerm.filter(goal => goal.trim() !== ''),
-        longTerm: data.goals.longTerm.filter(goal => goal.trim() !== ''),
-        skillsDevelopment: data.goals.skillsDevelopment.filter(skill => skill.trim() !== '')
+    try {
+      // Filter out empty goals but ensure at least one exists
+      const cleanedData = {
+        ...data,
+        goals: {
+          shortTerm: shortTermGoals.filter(goal => goal.trim() !== ''),
+          longTerm: longTermGoals.filter(goal => goal.trim() !== ''),
+          skillsDevelopment: skillsToLearn.filter(skill => skill.trim() !== '')
+        }
       }
+
+      // Validate with schema
+      professionalInfoSchema.parse(cleanedData)
+      updateFormSection('professional', cleanedData, 2)
+      onNext()
+    } catch (error) {
+      console.error('Validation failed:', error)
     }
-    updateFormSection('professional', cleanedData)
-    onNext()
   }
 
   return (
@@ -85,7 +87,7 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
       description="Tell us about your work or studies and your career aspirations."
       onNext={handleSubmit(onSubmit)}
       onPrevious={onPrevious}
-      isNextDisabled={!isValid}
+      isNextDisabled={false}
     >
       <form className="space-y-6">
         {/* Current Status */}
@@ -202,18 +204,26 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               Short-term Goals (1-6 months)
             </label>
             <div className="space-y-3">
-              {shortTermFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
+              {shortTermGoals.map((goal, index) => (
+                <div key={index} className="flex gap-2">
                   <input
-                    {...register(`goals.shortTerm.${index}`)}
                     type="text"
+                    value={goal}
+                    onChange={(e) => {
+                      const newGoals = [...shortTermGoals]
+                      newGoals[index] = e.target.value
+                      setShortTermGoals(newGoals)
+                    }}
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200"
                     placeholder="e.g., Complete my current project, Learn React"
                   />
-                  {shortTermFields.length > 1 && (
+                  {shortTermGoals.length > 1 && (
                     <button
                       type="button"
-                      onClick={() => removeShortTerm(index)}
+                      onClick={() => {
+                        const newGoals = shortTermGoals.filter((_, i) => i !== index)
+                        setShortTermGoals(newGoals)
+                      }}
                       className="px-3 py-3 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <X className="w-5 h-5" />
@@ -223,7 +233,7 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               ))}
               <button
                 type="button"
-                onClick={() => appendShortTerm('')}
+                onClick={() => setShortTermGoals([...shortTermGoals, ''])}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-black transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -241,18 +251,26 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               Long-term Goals (1-5 years)
             </label>
             <div className="space-y-3">
-              {longTermFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
+              {longTermGoals.map((goal, index) => (
+                <div key={index} className="flex gap-2">
                   <input
-                    {...register(`goals.longTerm.${index}`)}
                     type="text"
+                    value={goal}
+                    onChange={(e) => {
+                      const newGoals = [...longTermGoals]
+                      newGoals[index] = e.target.value
+                      setLongTermGoals(newGoals)
+                    }}
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200"
                     placeholder="e.g., Become a senior engineer, Start my own company"
                   />
-                  {longTermFields.length > 1 && (
+                  {longTermGoals.length > 1 && (
                     <button
                       type="button"
-                      onClick={() => removeLongTerm(index)}
+                      onClick={() => {
+                        const newGoals = longTermGoals.filter((_, i) => i !== index)
+                        setLongTermGoals(newGoals)
+                      }}
                       className="px-3 py-3 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <X className="w-5 h-5" />
@@ -262,7 +280,7 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               ))}
               <button
                 type="button"
-                onClick={() => appendLongTerm('')}
+                onClick={() => setLongTermGoals([...longTermGoals, ''])}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-black transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -280,18 +298,26 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               Skills You Want to Develop
             </label>
             <div className="space-y-3">
-              {skillsFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
+              {skillsToLearn.map((skill, index) => (
+                <div key={index} className="flex gap-2">
                   <input
-                    {...register(`goals.skillsDevelopment.${index}`)}
                     type="text"
+                    value={skill}
+                    onChange={(e) => {
+                      const newSkills = [...skillsToLearn]
+                      newSkills[index] = e.target.value
+                      setSkillsToLearn(newSkills)
+                    }}
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200"
                     placeholder="e.g., Public speaking, Machine learning, Leadership"
                   />
-                  {skillsFields.length > 1 && (
+                  {skillsToLearn.length > 1 && (
                     <button
                       type="button"
-                      onClick={() => removeSkill(index)}
+                      onClick={() => {
+                        const newSkills = skillsToLearn.filter((_, i) => i !== index)
+                        setSkillsToLearn(newSkills)
+                      }}
                       className="px-3 py-3 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <X className="w-5 h-5" />
@@ -301,7 +327,7 @@ export function ProfessionalInfoStep({ onNext, onPrevious }: ProfessionalInfoSte
               ))}
               <button
                 type="button"
-                onClick={() => appendSkill('')}
+                onClick={() => setSkillsToLearn([...skillsToLearn, ''])}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-black transition-colors"
               >
                 <Plus className="w-4 h-4" />

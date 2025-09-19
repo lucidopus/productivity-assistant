@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Calendar, Repeat, FolderOpen, Clock, AlertCircle } from 'lucide-react'
@@ -39,39 +39,38 @@ export function CommitmentsCard({ commitments }: CommitmentsCardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {commitments.recurring && commitments.recurring.length > 0 && (
+          {commitments.weeklyCommitments && commitments.weeklyCommitments.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Repeat className="h-4 w-4" />
                 Recurring Events
               </h4>
               <div className="space-y-3">
-                {commitments.recurring.map((event, index) => (
+                {commitments.weeklyCommitments.map((event, index) => (
                   <div key={index} className="p-3 rounded-lg bg-secondary">
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium">{event.title}</h5>
+                      <h5 className="font-medium">{event.name}</h5>
                       <span className="text-xs px-2 py-1 rounded-full bg-primary text-primary-foreground">
                         {event.frequency}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                      {event.day && (
+                      {event.timeRequired && (
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {event.day}
+                          {event.timeRequired}
                         </div>
                       )}
-                      {event.time && (
+                      {false && (
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {formatTime(event.time)}
-                          {event.endTime && ` - ${formatTime(event.endTime)}`}
+                          Time info not available
                         </div>
                       )}
-                      {event.travelTime && (
+                      {false && (
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {event.travelTime}min travel
+                          Travel time
                         </div>
                       )}
                     </div>
@@ -81,14 +80,14 @@ export function CommitmentsCard({ commitments }: CommitmentsCardProps) {
             </div>
           )}
 
-          {commitments.projects && commitments.projects.length > 0 && (
+          {commitments.currentProjects && commitments.currentProjects.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <FolderOpen className="h-4 w-4" />
                 Projects
               </h4>
               <div className="space-y-3">
-                {commitments.projects.map((project, index) => (
+                {commitments.currentProjects.map((project, index) => (
                   <div key={index} className="p-3 rounded-lg bg-secondary">
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium">{project.name}</h5>
@@ -117,8 +116,8 @@ export function CommitmentsCard({ commitments }: CommitmentsCardProps) {
             </div>
           )}
 
-          {(!commitments.recurring || commitments.recurring.length === 0) &&
-           (!commitments.projects || commitments.projects.length === 0) && (
+          {(!commitments.weeklyCommitments || commitments.weeklyCommitments.length === 0) &&
+           (!commitments.currentProjects || commitments.currentProjects.length === 0) && (
             <div className="text-center py-8">
               <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
               <h3 className="font-medium text-muted-foreground mb-1">No Commitments</h3>

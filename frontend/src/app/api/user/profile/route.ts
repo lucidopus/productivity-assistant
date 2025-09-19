@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 
 export async function GET(request: NextRequest) {
   try {

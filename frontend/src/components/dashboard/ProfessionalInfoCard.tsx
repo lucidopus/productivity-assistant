@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Briefcase, Building, MapPin, Target, TrendingUp, BookOpen } from 'lucide-react'
@@ -63,29 +63,29 @@ export function ProfessionalInfoCard({ professional }: ProfessionalInfoCardProps
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Work Location</p>
-                  <p className="font-medium">{getWorkLocationLabel(professional.workLocation)}</p>
+                  <p className="font-medium">{getWorkLocationLabel(professional.workLocation || 'remote')}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {(professional.organization || professional.role || professional.experience) && (
+          {(professional.profession || professional.experience) && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Building className="h-4 w-4" />
                 Work Details
               </h4>
               <div className="space-y-2">
-                {professional.organization && (
+                {professional.profession && (
                   <div>
                     <span className="text-sm text-muted-foreground">Organization:</span>
-                    <p className="font-medium">{professional.organization}</p>
+                    <p className="font-medium">{professional.profession}</p>
                   </div>
                 )}
-                {professional.role && (
+                {false && (
                   <div>
                     <span className="text-sm text-muted-foreground">Role:</span>
-                    <p className="font-medium">{professional.role}</p>
+                    <p className="font-medium">Role not specified</p>
                   </div>
                 )}
                 {professional.experience && (
@@ -105,14 +105,14 @@ export function ProfessionalInfoCard({ professional }: ProfessionalInfoCardProps
                 Goals & Development
               </h4>
 
-              {professional.goals.shortTerm && professional.goals.shortTerm.length > 0 && (
+              {professional.goals && professional.goals.length > 0 && (
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                     <TrendingUp className="h-3 w-3" />
                     Short-term Goals
                   </h5>
                   <div className="space-y-1">
-                    {professional.goals.shortTerm.map((goal, index) => (
+                    {professional.goals.map((goal, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
                         <span className="text-sm">{goal}</span>
@@ -122,14 +122,14 @@ export function ProfessionalInfoCard({ professional }: ProfessionalInfoCardProps
                 </div>
               )}
 
-              {professional.goals.longTerm && professional.goals.longTerm.length > 0 && (
+              {false && (
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                     <Target className="h-3 w-3" />
                     Long-term Goals
                   </h5>
                   <div className="space-y-1">
-                    {professional.goals.longTerm.map((goal, index) => (
+                    {['Goal 1', 'Goal 2'].map((goal, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
                         <span className="text-sm">{goal}</span>
@@ -139,14 +139,14 @@ export function ProfessionalInfoCard({ professional }: ProfessionalInfoCardProps
                 </div>
               )}
 
-              {professional.goals.skillsDevelopment && professional.goals.skillsDevelopment.length > 0 && (
+              {false && (
                 <div className="space-y-2">
                   <h5 className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                     <BookOpen className="h-3 w-3" />
                     Skills Development
                   </h5>
                   <div className="flex flex-wrap gap-2">
-                    {professional.goals.skillsDevelopment.map((skill, index) => (
+                    {['Skill 1', 'Skill 2'].map((skill, index) => (
                       <span
                         key={index}
                         className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"

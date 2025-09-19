@@ -5,16 +5,15 @@ import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react'
 import { useOnboardingStore } from '@/stores/onboarding'
 
 export function CompletionStep() {
-  const { progress } = useOnboardingStore()
+  const { progress, currentFormData } = useOnboardingStore()
 
   const completionPercentage = Math.round(
-    (Object.keys(progress.formData).length / 6) * 100
+    (Object.keys(currentFormData || {}).length / 6) * 100
   )
 
   const handleContinue = () => {
-    // For now, go back to home page
-    // In a real app, this would navigate to the dashboard
-    window.location.href = '/'
+    // Navigate to dashboard since onboarding is complete
+    window.location.href = '/dashboard'
   }
 
   return (
@@ -48,7 +47,7 @@ export function CompletionStep() {
           </h1>
 
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Perfect! We've gathered everything we need to create your personalized productivity experience.
+            Perfect! We&apos;ve gathered everything we need to create your personalized productivity experience.
             Your AI assistant now understands your preferences, schedule, and goals.
           </p>
         </motion.div>
@@ -114,7 +113,7 @@ export function CompletionStep() {
             <div>
               <h3 className="font-semibold mb-2">📱 Daily Check-ins</h3>
               <p className="text-gray-300 text-sm">
-                Each evening at 10 PM, you'll receive a personalized plan for the next day.
+                Each evening at 10 PM, you&apos;ll receive a personalized plan for the next day.
               </p>
             </div>
 

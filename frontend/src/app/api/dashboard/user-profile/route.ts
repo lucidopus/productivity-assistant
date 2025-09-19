@@ -1,62 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserProfilesCollection, getOnboardingSessionsCollection } from '@/lib/mongodb'
-import { UserProfile } from '@/types/onboarding'
+import { connectToDatabase } from '@/lib/mongodb'
+import { UserProfile, isProfileComplete } from '@/types/profile'
+import { getTokenFromNextRequest, verifyToken } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, we'll get the most recent completed onboarding session
-    // In a real app, you'd use user authentication to get the specific user's data
-    const onboardingSessionsCollection = await getOnboardingSessionsCollection()
-
-    // Find the most recent session with completed onboarding data
-    const recentSession = await onboardingSessionsCollection
-      .findOne(
-        {
-          'formData.personal': { $exists: true },
-          'formData.professional': { $exists: true },
-          'formData.schedule': { $exists: true },
-          'formData.workStyle': { $exists: true },
-          'formData.wellness': { $exists: true },
-          'formData.commitments': { $exists: true }
-        },
-        { sort: { updatedAt: -1 } }
-      )
-
-    if (!recentSession || !recentSession.formData) {
+    // Get token and verify user
+    const token = getTokenFromNextRequest(request);
+    if (!token) {
       return NextResponse.json(
-        { success: false, error: 'No completed user profile found' },
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // Connect to database
+    const { db } = await connectToDatabase();
+
+    // Find the user's profile
+    const profile = await db.collection('profiles').findOne({
+      userId: payload.userId
+    }) as UserProfile | null;
+
+    if (!profile) {
+      return NextResponse.json(
+        { success: false, error: 'No user profile found' },
         { status: 404 }
       )
     }
 
-    // Convert the MongoDB document to our UserProfile type
-    const userProfile: UserProfile = {
-      personal: {
-        ...recentSession.formData.personal,
-        dateOfBirth: new Date(recentSession.formData.personal.dateOfBirth)
-      },
-      professional: recentSession.formData.professional,
-      schedule: recentSession.formData.schedule,
-      workStyle: recentSession.formData.workStyle,
-      wellness: recentSession.formData.wellness,
-      commitments: {
-        ...recentSession.formData.commitments,
-        projects: recentSession.formData.commitments.projects?.map((project: any) => ({
-          ...project,
-          deadline: project.deadline ? new Date(project.deadline) : undefined
-        })) || []
-      },
-      metadata: {
-        onboardingCompleted: new Date(recentSession.createdAt),
-        lastUpdated: new Date(recentSession.updatedAt),
-        profileVersion: "1.0"
-      }
+    // Check if profile is complete
+    const profileComplete = isProfileComplete(profile);
+
+    if (!profileComplete) {
+      return NextResponse.json(
+        { success: false, error: 'Profile not completed yet' },
+        { status: 404 }
+      )
     }
 
     return NextResponse.json({
       success: true,
-      data: userProfile,
-      sessionId: recentSession.sessionId
+      data: profile,
+      profileComplete,
+      onboardingProgress: profile.onboardingProgress
     })
   } catch (error) {
     console.error('Error fetching user profile:', error)
