@@ -72,6 +72,7 @@ tmp/
 .trigger.claude/
 docs/
 tasks/
+CLAUDE.md
 
 # Yarn
 .yarn/*

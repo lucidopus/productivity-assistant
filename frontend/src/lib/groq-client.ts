@@ -1,5 +1,10 @@
 import Groq from 'groq-sdk';
 import { BellaFunction, SetContinuationFlagCall, SaveWeeklyPlanCall } from '@/types/bella';
+import {
+  generateBellaSystemPrompt,
+  formatChatHistoryPrompt,
+  ErrorPrompts
+} from './prompts';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -99,41 +104,7 @@ export async function generateBellaResponse(
 
   while (retryCount < maxRetries) {
     try {
-      const systemPrompt = `You are Bella, a warm and intelligent AI assistant who helps people plan their weekly schedules through natural conversation. You engage users every Sunday evening to understand their weekly targets and create personalized Monday-Friday plans.
-
-Your personality:
-- Warm, friendly, and encouraging
-- Strategic and thoughtful in gathering information
-- Natural conversationalist who asks smart questions
-
-${userProfile}
-
-STRATEGIC QUESTIONING APPROACH:
-- Ask 2-3 well-chosen questions to understand their week
-- Focus on: key commitments, deadlines, preferences, and constraints
-- Never re-ask something already answered
-- Don't ask long lists of questions - be conversational
-- Ask follow-ups only when genuinely needed for planning
-
-CRITICAL PLANNING RULES:
-1. **Only use information the user provides** - NEVER add your own tasks, appointments, or commitments
-2. **Don't hallucinate or assume activities** - If they mention a presentation, don't assume they need prep time unless they say so
-3. **Ask strategic questions** - Get timing, duration, and any preparation needs for their actual commitments
-4. **Work with what you have** - Don't over-optimize or ask for unnecessary details
-
-INFORMATION TO GATHER:
-- Specific commitments they mention (meetings, deadlines, appointments)
-- Timing and duration of these commitments
-- Their work preferences (morning focus time, break preferences)
-- Any preparation or travel time needed
-
-WHEN TO GENERATE PLAN:
-Generate the plan when you have their key commitments and basic preferences. Don't wait for perfect information.
-
-WHEN TO CONTINUE CONVERSATION:
-Only use set_continuation_flag with continueConversation: true if you're missing essential timing or critical details that would make planning impossible.
-
-Remember: Be strategic, not excessive. Quality questions over quantity. Never invent tasks they didn't mention.`;
+      const systemPrompt = generateBellaSystemPrompt(userProfile);
 
       const response = await groq.chat.completions.create({
         model: process.env.GROQ_DEFAULT_MODEL || 'llama-3.1-70b-versatile',
@@ -173,7 +144,7 @@ Remember: Be strategic, not excessive. Quality questions over quantity. Never in
       }
 
       return {
-        message: message.content || "I'm processing your request...",
+        message: message.content || ErrorPrompts.processingMessage.template,
         functionCall
       };
 
@@ -183,7 +154,7 @@ Remember: Be strategic, not excessive. Quality questions over quantity. Never in
 
       if (retryCount === maxRetries) {
         return {
-          message: "I'm having trouble processing right now. Let's try again in a few minutes.",
+          message: ErrorPrompts.apiError.template,
           error: error instanceof Error ? error.message : 'Unknown error'
         };
       }
@@ -196,26 +167,14 @@ Remember: Be strategic, not excessive. Quality questions over quantity. Never in
   }
 
   return {
-    message: "I encountered an unexpected error. Please try again.",
+    message: ErrorPrompts.maxRetriesError.template,
     error: 'Max retries exceeded'
   };
 }
 
 // Helper function to format chat history for Groq
 export function formatChatHistory(messages: { role: string; content: string; timestamp: Date }[]): string {
-  if (messages.length === 0) {
-    return "This is the start of a new weekly planning conversation.";
-  }
-
-  const formattedMessages = messages
-    .slice(-10) // Last 10 messages only
-    .map(msg => {
-      const roleLabel = msg.role === 'assistant' ? 'Bella' : 'Human';
-      return `${roleLabel}: ${msg.content}`;
-    })
-    .join('\n\n');
-
-  return `Previous conversation:\n\n${formattedMessages}\n\nPlease continue the conversation naturally.`;
+  return formatChatHistoryPrompt(messages);
 }
 
 // Helper function to get next Monday and Friday dates
