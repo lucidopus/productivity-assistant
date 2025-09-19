@@ -44,12 +44,10 @@ export async function POST(request: NextRequest) {
     }) as UserProfile | null;
 
     let profileComplete = false;
-    let currentStep = 1;
     let onboardingProgress = null;
 
     if (profile) {
       profileComplete = isProfileComplete(profile);
-      currentStep = profile.onboardingProgress.currentStep;
       onboardingProgress = profile.onboardingProgress;
     }
 

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { motion } from 'framer-motion'
 import { User, MapPin, Globe, Heart, Calendar } from 'lucide-react'
-import { formatDate, calculateAge } from '@/lib/utils'
 
 interface PersonalInfoCardProps {
   personal: UserProfile['personal']

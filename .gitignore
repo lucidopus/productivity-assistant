@@ -4,7 +4,7 @@
 !.yarn/releases
 !.yarn/versions
 .claude
-.claude/
+# .claude/
 .DS_Store
 .env*
 .eslintcache

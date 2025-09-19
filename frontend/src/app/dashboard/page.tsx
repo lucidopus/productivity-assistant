@@ -62,7 +62,7 @@ const fadeInVariants: Variants = {
 }
 
 export default function DashboardPage() {
-  const { user, hasProfile, profileComplete, onboardingProgress, logout, loading: authLoading } = useAuth()
+  const { user, profileComplete, loading: authLoading } = useAuth()
   const router = useRouter()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)

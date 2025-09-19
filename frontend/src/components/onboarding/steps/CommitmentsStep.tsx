@@ -31,14 +31,14 @@ const daysOfWeek = [
 ]
 
 export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: CommitmentsStepProps) {
-  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
+  const { updateFormSection } = useOnboardingStore()
 
   const {
     register,
     handleSubmit,
     control,
     watch,
-    formState: { errors, isValid }
+    formState: { isValid }
   } = useForm<CommitmentsData>({
     defaultValues: {
       recurring: [{ title: '', frequency: '', day: '', time: '', endTime: '', travelTime: 0 }],
