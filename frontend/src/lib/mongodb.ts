@@ -47,3 +47,18 @@ export async function getUserProfilesCollection() {
   const db = await getDatabase()
   return db.collection('profiles')
 }
+
+export async function getChatsCollection() {
+  const db = await getDatabase()
+  return db.collection('chats')
+}
+
+export async function getWeeklyPlansCollection() {
+  const db = await getDatabase()
+  return db.collection('weekly_plans')
+}
+
+export async function getErrorLogsCollection() {
+  const db = await getDatabase()
+  return db.collection('error_logs')
+}
