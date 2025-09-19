@@ -23,7 +23,7 @@ const stressManagementOptions = [
 ]
 
 export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
-  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
+  const { currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -32,9 +32,9 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
     setValue,
     formState: { errors, isValid }
   } = useForm<WellnessData>({
-    resolver: zodResolver(wellnessSchema),
-    defaultValues: currentFormData?.wellness || {
-      energyPatterns: { morning: '5', afternoon: '5', evening: '5' },
+    resolver: zodResolver(wellnessSchema as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- Fix for @hookform/resolvers v5 compatibility
+    defaultValues: (currentFormData?.wellness as WellnessData) || {
+      energyPatterns: { morning: 5, afternoon: 5, evening: 5 },
       stressManagement: []
     },
     mode: 'onTouched'
@@ -123,7 +123,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
                     <div className={cn(
                       "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer",
                       "transition-all duration-200",
-                      parseInt(watch('energyPatterns.morning') || '0') === level.value
+                      parseInt(String(watch('energyPatterns.morning') || '0')) === level.value
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:border-gray-400"
                     )}>
@@ -155,7 +155,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
                     <div className={cn(
                       "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer",
                       "transition-all duration-200",
-                      parseInt(watch('energyPatterns.afternoon') || '0') === level.value
+                      parseInt(String(watch('energyPatterns.afternoon') || '0')) === level.value
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:border-gray-400"
                     )}>
@@ -187,7 +187,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
                     <div className={cn(
                       "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer",
                       "transition-all duration-200",
-                      parseInt(watch('energyPatterns.evening') || '0') === level.value
+                      parseInt(String(watch('energyPatterns.evening') || '0')) === level.value
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:border-gray-400"
                     )}>

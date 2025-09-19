@@ -26,7 +26,7 @@ const livingStatusOptions = [
 ]
 
 export function PersonalInfoStep({ onNext, onPrevious, showPrevious = true }: PersonalInfoStepProps) {
-  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
+  const { currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,

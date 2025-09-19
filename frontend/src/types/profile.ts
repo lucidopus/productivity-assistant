@@ -232,6 +232,7 @@ export function createEmptyProfile(userId: string): Omit<UserProfile, '_id'> {
       name: '',
     },
     professional: {
+      status: '',
       currentStatus: '',
     },
     schedule: {},

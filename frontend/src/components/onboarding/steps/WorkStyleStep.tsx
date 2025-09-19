@@ -50,11 +50,11 @@ const focusDurationOptions = [
 ]
 
 export function WorkStyleStep({ onNext, onPrevious }: WorkStyleStepProps) {
-  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
+  const { currentFormData, updateFormSection } = useOnboardingStore()
 
-  const defaultValues = currentFormData?.workStyle || {
+  const defaultValues = (currentFormData?.workStyle as WorkStyleData) || {
     planningPreference: 'mixed' as const,
-    focusDuration: '60',
+    focusDuration: 60,
     taskPreferences: [],
     motivators: [],
     blockers: []
@@ -65,9 +65,9 @@ export function WorkStyleStep({ onNext, onPrevious }: WorkStyleStepProps) {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid }
+    formState: { errors }
   } = useForm<WorkStyleData>({
-    resolver: zodResolver(workStyleSchema),
+    resolver: zodResolver(workStyleSchema as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- Fix for @hookform/resolvers v5 compatibility
     defaultValues,
     mode: 'onTouched'
   })
@@ -169,7 +169,7 @@ export function WorkStyleStep({ onNext, onPrevious }: WorkStyleStepProps) {
                 <div className={cn(
                   "flex-1 px-3 py-2 border rounded-lg text-center cursor-pointer text-sm",
                   "transition-all duration-200",
-                  parseInt(watch('focusDuration') || '0') === option.value
+                  parseInt(String(watch('focusDuration') || '0')) === option.value
                     ? "border-black bg-black text-white"
                     : "border-gray-300 hover:border-gray-400"
                 )}>

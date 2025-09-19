@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { getTokenFromNextRequest, verifyToken } from '@/lib/auth';
-import { ObjectId } from 'mongodb';
 import {
   isProfileComplete,
   UserProfile
@@ -64,8 +63,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const validatedData = { step, section, data };
 
     // For now, accept the data as-is (we can add detailed validation later)
     const validatedSectionData = data;

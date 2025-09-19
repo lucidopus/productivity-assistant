@@ -3,8 +3,7 @@ import { z } from 'zod'
 export const personalInfoSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   dateOfBirth: z.date({
-    required_error: 'Date of birth is required',
-    invalid_type_error: 'Please enter a valid date'
+    message: 'Date of birth is required'
   }),
   location: z.object({
     city: z.string().min(1, 'City is required'),
@@ -20,13 +19,13 @@ export const personalInfoSchema = z.object({
 
 export const professionalInfoSchema = z.object({
   status: z.enum(['student', 'employed', 'self-employed', 'other'], {
-    required_error: 'Please select your current status'
+    message: 'Please select your current status'
   }),
   organization: z.string().optional(),
   role: z.string().optional(),
   experience: z.number().min(0).optional(),
   workLocation: z.enum(['remote', 'hybrid', 'onsite'], {
-    required_error: 'Please select your work location'
+    message: 'Please select your work location'
   }),
   goals: z.object({
     shortTerm: z.array(z.string()).min(1, 'Please add at least one short-term goal'),
@@ -51,10 +50,10 @@ export const scheduleInfoSchema = z.object({
 
 export const workStyleSchema = z.object({
   planningPreference: z.enum(['detailed', 'flexible', 'mixed'], {
-    required_error: 'Please select your planning preference'
+    message: 'Please select your planning preference'
   }),
   focusDuration: z.string({
-    required_error: 'Please select your focus duration'
+    message: 'Please select your focus duration'
   }).transform((val) => parseInt(val, 10)).pipe(
     z.number().min(15, 'Focus duration must be at least 15 minutes')
   ),

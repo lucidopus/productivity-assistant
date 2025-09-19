@@ -10,12 +10,6 @@ interface WellnessCardProps {
 }
 
 export function WellnessCard({ wellness }: WellnessCardProps) {
-  const getEnergyRating = (rating: number) => {
-    if (rating >= 8) return { label: 'High', color: 'bg-green-500' }
-    if (rating >= 6) return { label: 'Good', color: 'bg-yellow-500' }
-    if (rating >= 4) return { label: 'Moderate', color: 'bg-orange-500' }
-    return { label: 'Low', color: 'bg-red-500' }
-  }
 
   return (
     <motion.div

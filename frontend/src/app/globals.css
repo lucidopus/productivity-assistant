@@ -220,3 +220,105 @@ input[type="radio"] {
 a {
   cursor: pointer;
 }
+
+/* Syntax highlighting for code blocks */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: var(--foreground);
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: var(--accent);
+}
+
+.hljs-string,
+.hljs-doctag {
+  color: var(--muted-foreground);
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: var(--foreground);
+  font-weight: bold;
+}
+
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: var(--foreground);
+  font-weight: normal;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: var(--accent);
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--muted-foreground);
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: var(--foreground);
+}
+
+.hljs-meta {
+  color: var(--muted-foreground);
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.hljs-addition {
+  background: var(--success);
+  color: oklch(100% 0 0);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* Dark mode adjustments for markdown in user messages */
+.markdown-content .hljs {
+  background: transparent;
+}

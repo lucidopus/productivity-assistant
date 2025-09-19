@@ -5,7 +5,7 @@ import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react'
 import { useOnboardingStore } from '@/stores/onboarding'
 
 export function CompletionStep() {
-  const { progress, currentFormData } = useOnboardingStore()
+  const { currentFormData } = useOnboardingStore()
 
   const completionPercentage = Math.round(
     (Object.keys(currentFormData || {}).length / 6) * 100

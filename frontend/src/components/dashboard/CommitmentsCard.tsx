@@ -4,7 +4,7 @@ import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Calendar, Repeat, FolderOpen, Clock, AlertCircle } from 'lucide-react'
-import { formatTime, formatDate, isOverdue, getTimeUntilDeadline } from '@/lib/utils'
+import { formatDate, isOverdue, getTimeUntilDeadline } from '@/lib/utils'
 
 interface CommitmentsCardProps {
   commitments: UserProfile['commitments']

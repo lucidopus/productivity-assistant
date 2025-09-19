@@ -25,7 +25,7 @@ const productivePeriodOptions = [
 ]
 
 export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) {
-  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
+  const { currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -34,8 +34,8 @@ export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) 
     setValue,
     formState: { errors, isValid }
   } = useForm<ScheduleInfoData>({
-    resolver: zodResolver(scheduleInfoSchema),
-    defaultValues: currentFormData?.schedule || {
+    resolver: zodResolver(scheduleInfoSchema as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- Fix for @hookform/resolvers v5 compatibility
+    defaultValues: (currentFormData?.schedule as ScheduleInfoData) || {
       wakeTime: '07:00',
       sleepTime: '23:00',
       workHours: { start: '09:00', end: '17:00' },

@@ -10,23 +10,6 @@ interface WorkStyleCardProps {
 }
 
 export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
-  const getPlanningPreferenceLabel = (preference: string) => {
-    const preferenceMap = {
-      'detailed': 'Detailed Planning',
-      'flexible': 'Flexible Approach',
-      'mixed': 'Mixed Approach'
-    }
-    return preferenceMap[preference as keyof typeof preferenceMap] || preference
-  }
-
-  const getPlanningPreferenceDescription = (preference: string) => {
-    const descriptionMap = {
-      'detailed': 'Prefers structured plans with specific timelines',
-      'flexible': 'Adapts to changing priorities and circumstances',
-      'mixed': 'Balances structure with flexibility'
-    }
-    return descriptionMap[preference as keyof typeof descriptionMap] || ''
-  }
 
   return (
     <motion.div
