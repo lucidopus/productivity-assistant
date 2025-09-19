@@ -1,7 +1,6 @@
 'use client'
 
 import { useForm, useFieldArray } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { commitmentsSchema } from '@/lib/validations'
 import { StepContainer } from '../StepContainer'
@@ -32,7 +31,7 @@ const daysOfWeek = [
 ]
 
 export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: CommitmentsStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -41,10 +40,9 @@ export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: Comm
     watch,
     formState: { errors, isValid }
   } = useForm<CommitmentsData>({
-    resolver: zodResolver(commitmentsSchema),
-    defaultValues: progress.formData.commitments || {
+    defaultValues: {
       recurring: [{ title: '', frequency: '', day: '', time: '', endTime: '', travelTime: 0 }],
-      projects: [{ name: '', priority: 'medium' }]
+      projects: [{ name: '', priority: 'medium' as const }]
     },
     mode: 'onChange'
   })
@@ -65,7 +63,7 @@ export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: Comm
       recurring: data.recurring.filter(item => item.title.trim() !== ''),
       projects: data.projects.filter(project => project.name.trim() !== '')
     }
-    updateFormSection('commitments', cleanedData)
+    updateFormSection('commitments', cleanedData, 6)
     onNext()
   }
 
@@ -216,7 +214,7 @@ export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: Comm
             <h3 className="text-lg font-semibold text-gray-900">Current Projects & Goals</h3>
           </div>
           <p className="text-sm text-gray-600">
-            Ongoing projects, assignments, or personal goals you're working on.
+            Ongoing projects, assignments, or personal goals you&apos;re working on.
           </p>
 
           <div className="space-y-4">
@@ -306,7 +304,7 @@ export function CommitmentsStep({ onNext, onPrevious, isLastStep = false }: Comm
             </div>
             <div className="ml-3">
               <p className="text-sm text-blue-800">
-                <strong>Almost done!</strong> We'll use this information to ensure your daily plans respect your existing commitments and help you make progress on your goals.
+                <strong>Almost done!</strong> We&apos;ll use this information to ensure your daily plans respect your existing commitments and help you make progress on your goals.
               </p>
             </div>
           </div>

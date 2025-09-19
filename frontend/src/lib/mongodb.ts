@@ -13,7 +13,7 @@ if (!uri) {
 if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
+  const globalWithMongo = global as typeof globalThis & {
     _mongoClientPromise?: Promise<MongoClient>
   }
 
@@ -37,12 +37,13 @@ export async function getDatabase() {
   return client.db('productivity_assistant')
 }
 
-export async function getUserProfilesCollection() {
-  const db = await getDatabase()
-  return db.collection('user_profiles')
+export async function connectToDatabase() {
+  const client = await clientPromise
+  const db = client.db('productivity_assistant')
+  return { client, db }
 }
 
-export async function getOnboardingSessionsCollection() {
+export async function getUserProfilesCollection() {
   const db = await getDatabase()
-  return db.collection('onboarding_sessions')
+  return db.collection('profiles')
 }

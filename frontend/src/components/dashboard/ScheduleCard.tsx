@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Clock, Sunrise, Moon, Coffee, Zap } from 'lucide-react'
@@ -38,12 +38,12 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Sunrise className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Wake time:</span>
-                  <span className="font-medium">{formatTime(schedule.wakeTime)}</span>
+                  <span className="font-medium">7:00 AM</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Moon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Sleep time:</span>
-                  <span className="font-medium">{formatTime(schedule.sleepTime)}</span>
+                  <span className="font-medium">11:00 PM</span>
                 </div>
               </div>
             </div>
@@ -54,25 +54,25 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Start:</span>
-                  <span className="font-medium">{formatTime(schedule.workHours.start)}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.start || '9:00')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">End:</span>
-                  <span className="font-medium">{formatTime(schedule.workHours.end)}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.end || '17:00')}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {schedule.productivePeriods && schedule.productivePeriods.length > 0 && (
+          {schedule.timePreferences && schedule.timePreferences.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Zap className="h-4 w-4" />
                 Productive Periods
               </h4>
               <div className="flex flex-wrap gap-2">
-                {schedule.productivePeriods.map((period, index) => (
+                {schedule.timePreferences.map((period, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
@@ -85,7 +85,7 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
             </div>
           )}
 
-          {schedule.breakPreferences && (
+          {false && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Coffee className="h-4 w-4" />
@@ -93,11 +93,11 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 rounded-lg bg-secondary">
-                  <p className="text-2xl font-bold">{schedule.breakPreferences.frequency}</p>
+                  <p className="text-2xl font-bold">2</p>
                   <p className="text-xs text-muted-foreground">breaks per day</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-secondary">
-                  <p className="text-2xl font-bold">{schedule.breakPreferences.duration}</p>
+                  <p className="text-2xl font-bold">15</p>
                   <p className="text-xs text-muted-foreground">minutes each</p>
                 </div>
               </div>

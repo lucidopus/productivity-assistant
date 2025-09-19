@@ -23,7 +23,7 @@ const stressManagementOptions = [
 ]
 
 export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -33,7 +33,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
     formState: { errors, isValid }
   } = useForm<WellnessData>({
     resolver: zodResolver(wellnessSchema),
-    defaultValues: progress.formData.wellness || {
+    defaultValues: currentFormData?.wellness || {
       energyPatterns: { morning: '5', afternoon: '5', evening: '5' },
       stressManagement: []
     },
@@ -43,7 +43,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
   const selectedStressManagement = watch('stressManagement') || []
 
   const onSubmit = (data: WellnessData) => {
-    updateFormSection('wellness', data)
+    updateFormSection('wellness', data, 5)
     onNext()
   }
 
@@ -241,7 +241,7 @@ export function WellnessStep({ onNext, onPrevious }: WellnessStepProps) {
             </div>
             <div className="ml-3">
               <p className="text-sm text-purple-800">
-                <strong>Wellness matters!</strong> We'll factor in your energy patterns and stress management techniques when creating your daily plans.
+                <strong>Wellness matters!</strong> We&apos;ll factor in your energy patterns and stress management techniques when creating your daily plans.
               </p>
             </div>
           </div>

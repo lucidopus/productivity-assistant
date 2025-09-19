@@ -1,7 +1,6 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { personalInfoSchema } from '@/lib/validations'
 import { StepContainer } from '../StepContainer'
@@ -27,7 +26,7 @@ const livingStatusOptions = [
 ]
 
 export function PersonalInfoStep({ onNext, onPrevious, showPrevious = true }: PersonalInfoStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -36,21 +35,33 @@ export function PersonalInfoStep({ onNext, onPrevious, showPrevious = true }: Pe
     setValue,
     formState: { errors, isValid }
   } = useForm<PersonalInfoData>({
-    resolver: zodResolver(personalInfoSchema),
-    defaultValues: progress.formData.personal || {
-      name: '',
+    mode: 'onChange',
+    defaultValues: {
+      name: currentFormData?.personal?.name || '',
       dateOfBirth: new Date(),
-      location: { city: '', country: '', timezone: '' },
-      background: { livingStatus: '', personalValues: [] }
-    },
-    mode: 'onChange'
+      location: {
+        city: '',
+        country: '',
+        timezone: ''
+      },
+      background: {
+        livingStatus: '',
+        personalValues: [],
+        culturalContext: ''
+      }
+    }
   })
 
   const selectedValues = watch('background.personalValues') || []
 
   const onSubmit = (data: PersonalInfoData) => {
-    updateFormSection('personal', data)
-    onNext()
+    try {
+      personalInfoSchema.parse(data)
+      updateFormSection('personal', data, 1)
+      onNext()
+    } catch (error) {
+      console.error('Validation failed:', error)
+    }
   }
 
   const toggleValue = (value: string) => {

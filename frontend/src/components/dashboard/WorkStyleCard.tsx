@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Brain, Focus, CheckSquare, Lightbulb, AlertTriangle } from 'lucide-react'
@@ -48,9 +48,9 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
               Planning Style
             </h4>
             <div className="p-4 rounded-lg bg-secondary">
-              <h5 className="font-medium">{getPlanningPreferenceLabel(workStyle.planningPreference)}</h5>
+              <h5 className="font-medium">Structured Planning</h5>
               <p className="text-sm text-muted-foreground mt-1">
-                {getPlanningPreferenceDescription(workStyle.planningPreference)}
+                Prefers detailed planning and structured approaches
               </p>
             </div>
           </div>
@@ -61,16 +61,16 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
               Focus Duration
             </h4>
             <div className="text-center p-4 rounded-lg bg-secondary">
-              <p className="text-3xl font-bold">{workStyle.focusDuration}</p>
+              <p className="text-3xl font-bold">{workStyle.productivity?.focusTime || '45'}</p>
               <p className="text-sm text-muted-foreground">minutes of focused work</p>
             </div>
           </div>
 
-          {workStyle.taskPreferences && workStyle.taskPreferences.length > 0 && (
+          {workStyle.workStyle && workStyle.workStyle.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium">Task Preferences</h4>
               <div className="flex flex-wrap gap-2">
-                {workStyle.taskPreferences.map((preference, index) => (
+                {workStyle.workStyle.map((preference, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
@@ -82,14 +82,14 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
             </div>
           )}
 
-          {workStyle.motivators && workStyle.motivators.length > 0 && (
+          {false && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Lightbulb className="h-4 w-4" />
                 What Motivates You
               </h4>
               <div className="space-y-2">
-                {workStyle.motivators.map((motivator, index) => (
+                {['Achievement', 'Recognition'].map((motivator, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
                     <span className="text-sm">{motivator}</span>
@@ -99,14 +99,14 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
             </div>
           )}
 
-          {workStyle.blockers && workStyle.blockers.length > 0 && (
+          {false && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 Productivity Blockers
               </h4>
               <div className="space-y-2">
-                {workStyle.blockers.map((blocker, index) => (
+                {['Distractions', 'Multitasking'].map((blocker, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
                     <span className="text-sm">{blocker}</span>

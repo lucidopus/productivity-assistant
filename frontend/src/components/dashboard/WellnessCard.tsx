@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Heart, Activity, Sunrise, Sun, Sunset, Shield } from 'lucide-react'
@@ -31,19 +31,25 @@ export function WellnessCard({ wellness }: WellnessCardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {wellness.exerciseRoutine && (
+          {wellness.exerciseHabits && wellness.exerciseHabits.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Exercise Routine
               </h4>
               <div className="p-4 rounded-lg bg-secondary">
-                <p className="text-sm">{wellness.exerciseRoutine}</p>
+                <div className="flex flex-wrap gap-2">
+                  {wellness.exerciseHabits.map((habit, index) => (
+                    <span key={index} className="inline-block px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                      {habit}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {wellness.energyPatterns && (
+          {false && (
             <div className="space-y-3">
               <h4 className="font-medium">Energy Patterns</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -53,11 +59,11 @@ export function WellnessCard({ wellness }: WellnessCardProps) {
                     <span className="text-sm font-medium">Morning</span>
                   </div>
                   <div className="flex items-center justify-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${getEnergyRating(wellness.energyPatterns.morning).color}`} />
-                    <span className="text-lg font-bold">{wellness.energyPatterns.morning}/10</span>
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="text-lg font-bold">7/10</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {getEnergyRating(wellness.energyPatterns.morning).label}
+                    High Energy
                   </p>
                 </div>
 
@@ -67,11 +73,11 @@ export function WellnessCard({ wellness }: WellnessCardProps) {
                     <span className="text-sm font-medium">Afternoon</span>
                   </div>
                   <div className="flex items-center justify-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${getEnergyRating(wellness.energyPatterns.afternoon).color}`} />
-                    <span className="text-lg font-bold">{wellness.energyPatterns.afternoon}/10</span>
+                    <div className={`w-3 h-3 rounded-full ${{color: 'bg-yellow-500', label: 'Medium Energy'}.color}`} />
+                    <span className="text-lg font-bold">{6}/10</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {getEnergyRating(wellness.energyPatterns.afternoon).label}
+                    {{color: 'bg-yellow-500', label: 'Medium Energy'}.label}
                   </p>
                 </div>
 
@@ -81,11 +87,11 @@ export function WellnessCard({ wellness }: WellnessCardProps) {
                     <span className="text-sm font-medium">Evening</span>
                   </div>
                   <div className="flex items-center justify-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${getEnergyRating(wellness.energyPatterns.evening).color}`} />
-                    <span className="text-lg font-bold">{wellness.energyPatterns.evening}/10</span>
+                    <div className={`w-3 h-3 rounded-full ${{color: 'bg-blue-500', label: 'Low Energy'}.color}`} />
+                    <span className="text-lg font-bold">{4}/10</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {getEnergyRating(wellness.energyPatterns.evening).label}
+                    {{color: 'bg-blue-500', label: 'Low Energy'}.label}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { UserProfile } from '@/types/onboarding'
+import { UserProfile } from '@/types/profile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { motion } from 'framer-motion'
@@ -34,7 +34,7 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
             <h3 className="text-heading font-semibold text-foreground mb-2">{personal.name}</h3>
             <div className="flex items-center gap-2 text-caption">
               <Calendar className="h-3 w-3" />
-              <span>{calculateAge(personal.dateOfBirth)} years old • Born {formatDate(personal.dateOfBirth)}</span>
+              <span>{personal.age ? `${personal.age} years old` : 'Age not specified'}</span>
             </div>
           </div>
         </motion.div>
@@ -52,10 +52,10 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
                 <MapPin className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 space-y-1">
-                <p className="font-semibold text-foreground">{personal.location.city}, {personal.location.country}</p>
+                <p className="font-semibold text-foreground">{personal.location || 'Location not specified'}</p>
                 <div className="flex items-center gap-1.5 text-caption">
                   <Globe className="h-3 w-3" />
-                  <span>{personal.location.timezone}</span>
+                  <span>{personal.timezone || 'Timezone not specified'}</span>
                 </div>
               </div>
             </div>
@@ -78,19 +78,19 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
           <div className="space-y-4 pl-8">
             <div className="space-y-2">
               <span className="text-label font-medium text-muted-foreground">Living Status</span>
-              <p className="text-body text-foreground">{personal.background.livingStatus}</p>
+              <p className="text-body text-foreground">{personal.background || 'Background not specified'}</p>
             </div>
-            {personal.background.culturalContext && (
+            {false && (
               <div className="space-y-2">
                 <span className="text-label font-medium text-muted-foreground">Cultural Context</span>
-                <p className="text-body leading-relaxed text-foreground/90">{personal.background.culturalContext}</p>
+                <p className="text-body leading-relaxed text-foreground/90">Cultural context</p>
               </div>
             )}
           </div>
         </motion.div>
 
         {/* Personal Values */}
-        {personal.background.personalValues && personal.background.personalValues.length > 0 && (
+        {personal.values && personal.values.length > 0 && (
           <motion.div
             className="space-y-4"
             initial={{ opacity: 0, y: 10 }}
@@ -104,7 +104,7 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
               Personal Values
             </h4>
             <div className="flex flex-wrap gap-2 pl-8">
-              {personal.background.personalValues.map((value, index) => (
+              {personal.values.map((value, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}

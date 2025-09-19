@@ -25,7 +25,7 @@ const productivePeriodOptions = [
 ]
 
 export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) {
-  const { progress, updateFormSection } = useOnboardingStore()
+  const { progress, currentFormData, updateFormSection } = useOnboardingStore()
 
   const {
     register,
@@ -35,7 +35,7 @@ export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) 
     formState: { errors, isValid }
   } = useForm<ScheduleInfoData>({
     resolver: zodResolver(scheduleInfoSchema),
-    defaultValues: progress.formData.schedule || {
+    defaultValues: currentFormData?.schedule || {
       wakeTime: '07:00',
       sleepTime: '23:00',
       workHours: { start: '09:00', end: '17:00' },
@@ -48,7 +48,7 @@ export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) 
   const selectedPeriods = watch('productivePeriods') || []
 
   const onSubmit = (data: ScheduleInfoData) => {
-    updateFormSection('schedule', data)
+    updateFormSection('schedule', data, 3)
     onNext()
   }
 
@@ -254,7 +254,7 @@ export function ScheduleInfoStep({ onNext, onPrevious }: ScheduleInfoStepProps) 
             </div>
             <div className="ml-3">
               <p className="text-sm text-blue-800">
-                <strong>Tip:</strong> We'll use this information to create daily plans that align with your natural energy patterns and preferred schedule.
+                <strong>Tip:</strong> We&apos;ll use this information to create daily plans that align with your natural energy patterns and preferred schedule.
               </p>
             </div>
           </div>
