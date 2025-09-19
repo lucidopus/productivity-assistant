@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { ChatMessage } from '@/types/bella';
 import { cn } from '@/lib/utils';
+import { MarkdownMessage } from './markdown-message';
 
 interface ChatInterfaceProps {
   className?: string;
@@ -166,7 +167,10 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
                     : "bg-card text-card-foreground border border-border mr-4"
                 )}
               >
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                <MarkdownMessage
+                  content={message.content}
+                  isUser={message.role === 'user'}
+                />
                 <div
                   className={cn(
                     "text-xs mt-2 opacity-70",
