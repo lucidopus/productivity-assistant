@@ -18,7 +18,7 @@ export async function POST() {
       }
     ]);
 
-    const userProfile = formatUserProfile("68cca41fb015304ecc79c64a");
+    const userProfile = await formatUserProfile("68cca41fb015304ecc79c64a");
 
     const response = await generateBellaResponse(testChatHistory, userProfile);
 

@@ -3,6 +3,11 @@ import { getChatsCollection, getWeeklyPlansCollection } from "../frontend/src/li
 import { generateBellaResponse, formatChatHistory, getWeekDates } from "../frontend/src/lib/groq-client";
 import { ChatSession, ChatMessage, WeeklyPlan, TaskItem, DayPlan, SetContinuationFlagCall, SaveWeeklyPlanCall } from "../frontend/src/types/bella";
 import { ObjectId } from "mongodb";
+import {
+  BellaPrompts,
+  fillPromptTemplate,
+  getHardcodedProfile
+} from "../frontend/src/lib/prompts";
 
 // Hardcoded user ID as specified in the implementation plan
 const HARDCODED_USER_ID = "68cca41fb015304ecc79c64a";
@@ -18,44 +23,11 @@ function generateMessageId(): string {
 }
 
 // Helper function to format user profile for context
-function formatUserProfile(): string {
-  const now = new Date();
-  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-  const monthName = now.toLocaleDateString('en-US', { month: 'long' });
-  const day = now.getDate();
-  const year = now.getFullYear();
-  const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-  const temporalContext = `Today is ${dayName}, ${monthName} ${day}, ${year}. The current time is ${time}.`;
-
-  return `${temporalContext}
-
-Harshil is a 24-year-old CS Master's student at Stanford, living with roommates in New Jersey.
-
-Schedule: Wakes at 8 AM, sleeps at midnight
-Peak productivity: Evening (5-9 PM) and Morning (8-12 PM)
-
-Weekly commitments:
-- CS-559 ML class: Tuesdays at 7:22 PM
-- Shopping Assistant project (due Nov 15, low priority)
-
-Goals: Complete 800 Leetcode problems, secure job
-Work style: Deep work sessions, motivated by autonomy
-Challenges: Perfectionism, unclear priorities, interruptions`;
+async function formatUserProfile(): Promise<string> {
+  const { formatProfileFromMongoDB } = await import("../frontend/src/lib/prompts");
+  return await formatProfileFromMongoDB(HARDCODED_USER_ID);
 }
 
-// Helper function to get next Monday's date for the week
-function getNextMonday(): Date {
-  const now = new Date();
-  const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-  const daysUntilNextMonday = currentDay === 0 ? 1 : 8 - currentDay;
-
-  const nextMonday = new Date(now);
-  nextMonday.setDate(now.getDate() + daysUntilNextMonday);
-  nextMonday.setHours(0, 0, 0, 0);
-
-  return nextMonday;
-}
 
 // Helper function to save weekly plan to database
 async function saveWeeklyPlan(
@@ -113,7 +85,7 @@ async function initializeConversation(sessionId: string, userId: string): Promis
       id: generateMessageId(),
       timestamp: new Date(),
       role: 'assistant',
-      content: "Hey! It's Sunday evening - time for our weekly planning session! 😊 I'm here to help you organize your upcoming week. Are you ready to plan together?"
+      content: BellaPrompts.initialMessage.template
     };
 
     const chatSession: ChatSession = {
@@ -160,7 +132,7 @@ async function processConversationIteration(sessionId: string, iteration: number
     // Get last 10 messages for context
     const recentMessages = session.messages.slice(-10);
     const chatHistory = formatChatHistory(recentMessages);
-    const userProfile = formatUserProfile();
+    const userProfile = await formatUserProfile();
 
     logger.info("Processing conversation iteration", {
       sessionId,
@@ -314,16 +286,12 @@ async function generateFinalPlan(sessionId: string): Promise<void> {
 
     // Format all messages for final planning
     const fullChatHistory = formatChatHistory(session.messages);
-    const userProfile = formatUserProfile();
+    const userProfile = await formatUserProfile();
 
     // Create a planning-focused prompt
-    const planningPrompt = `${fullChatHistory}
-
-Now that we have all the information needed, please generate a comprehensive weekly plan using the save_weekly_plan function. Make sure to:
-1. Extract all weekly targets from our conversation
-2. Create detailed daily schedules for Monday through Friday
-3. Include specific times, travel considerations, and preparation time
-4. Respect the user's schedule preferences and constraints`;
+    const planningPrompt = fillPromptTemplate(BellaPrompts.finalPlanningPrompt.template, {
+      chatHistory: fullChatHistory
+    });
 
     const response = await generateBellaResponse(planningPrompt, userProfile);
 
@@ -334,11 +302,14 @@ Now that we have all the information needed, please generate a comprehensive wee
       const savedPlan = await saveWeeklyPlan(session.userId, sessionId, planCall);
 
       // Add final message and complete session
+      const planSummary = "Your schedule includes your key commitments and focused work sessions.";
       const finalMessage: ChatMessage = {
         id: generateMessageId(),
         timestamp: new Date(),
         role: 'assistant',
-        content: "Perfect! I've created your weekly plan based on our conversation. Your schedule includes your MongoDB demo on Wednesday, Applied AI homework completion, and temple visit on Thursday. The plan is saved and ready for you to follow. Have a great week! 🌟"
+        content: fillPromptTemplate(BellaPrompts.planCompletionMessage.template, {
+          planSummary
+        })
       };
 
       await chatsCollection.updateOne(

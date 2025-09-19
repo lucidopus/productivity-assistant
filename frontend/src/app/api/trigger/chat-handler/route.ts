@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Get recent chat history (last 10 messages)
     const recentMessages = session.messages.slice(-10);
     const chatHistory = formatChatHistory(recentMessages);
-    const userProfile = formatUserProfile(userId);
+    const userProfile = await formatUserProfile(userId);
 
     // Generate Bella's response using Groq
     const bellaResponse = await generateBellaResponse(chatHistory, userProfile);
