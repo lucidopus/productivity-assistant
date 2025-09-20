@@ -38,12 +38,12 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Sunrise className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Wake time:</span>
-                  <span className="font-medium">7:00 AM</span>
+                  <span className="font-medium">{(schedule as any).wakeTime || '7:00 AM'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Moon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Sleep time:</span>
-                  <span className="font-medium">11:00 PM</span>
+                  <span className="font-medium">{(schedule as any).sleepTime || '11:00 PM'}</span>
                 </div>
               </div>
             </div>
@@ -54,36 +54,39 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Start:</span>
-                  <span className="font-medium">{formatTime(schedule.workingHours?.start || '9:00')}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.start || (schedule as any).workHours?.start || '9:00')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">End:</span>
-                  <span className="font-medium">{formatTime(schedule.workingHours?.end || '17:00')}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.end || (schedule as any).workHours?.end || '17:00')}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {schedule.timePreferences && schedule.timePreferences.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-medium flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Productive Periods
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {schedule.timePreferences.map((period, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
-                  >
-                    {getProductivePeriodIcon(period)}
-                    {period}
-                  </span>
-                ))}
+          {(() => {
+            const productivePeriods = schedule.timePreferences || (schedule as any).productivePeriods || [];
+            return productivePeriods.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Productive Periods
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {productivePeriods.map((period: string, index: number) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                    >
+                      {getProductivePeriodIcon(period)}
+                      {period}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {false && (
             <div className="space-y-3">

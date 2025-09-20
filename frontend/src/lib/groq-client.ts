@@ -106,6 +106,24 @@ export async function generateBellaResponse(
     try {
       const systemPrompt = generateBellaSystemPrompt(userProfile);
 
+      // DEBUG: Log the complete prompt being sent to the LLM
+      console.log('='.repeat(80));
+      console.log('🔍 DEBUG: COMPLETE PROMPT BEING SENT TO LLM');
+      console.log('='.repeat(80));
+      console.log('\n📋 SYSTEM PROMPT:');
+      console.log('-'.repeat(40));
+      console.log(systemPrompt);
+      console.log('-'.repeat(40));
+      console.log('\n💬 USER MESSAGE (Chat History):');
+      console.log('-'.repeat(40));
+      console.log(chatHistory);
+      console.log('-'.repeat(40));
+      console.log('\n🔧 MODEL:', process.env.GROQ_DEFAULT_MODEL || 'llama-3.1-70b-versatile');
+      console.log('🌡️  TEMPERATURE:', 0.7);
+      console.log('🛠️  TOOLS ENABLED:', bellaFunctions.map(f => f.name).join(', '));
+      console.log('='.repeat(80));
+      console.log('\n');
+
       const response = await groq.chat.completions.create({
         model: process.env.GROQ_DEFAULT_MODEL || 'llama-3.1-70b-versatile',
         messages: [
@@ -127,21 +145,38 @@ export async function generateBellaResponse(
         throw new Error('No response from Groq');
       }
 
+      // DEBUG: Log the LLM response
+      console.log('='.repeat(80));
+      console.log('✅ DEBUG: LLM RESPONSE RECEIVED');
+      console.log('='.repeat(80));
+      console.log('\n📝 Message Content:');
+      console.log('-'.repeat(40));
+      console.log(message.content || '[No text content]');
+      console.log('-'.repeat(40));
+
       let functionCall;
       if (message.tool_calls && message.tool_calls.length > 0) {
         const toolCall = message.tool_calls[0];
+        console.log('\n🔧 Function Call Detected:');
+        console.log('  Function Name:', toolCall.function.name);
+        console.log('  Raw Arguments:', toolCall.function.arguments);
         try {
           functionCall = {
             name: toolCall.function.name,
             arguments: JSON.parse(toolCall.function.arguments)
           };
+          console.log('  Parsed Arguments:', JSON.stringify(functionCall.arguments, null, 2));
         } catch (parseError) {
           console.error('Failed to parse function call arguments:', parseError);
           console.error('Raw arguments:', toolCall.function.arguments);
           // Continue without function call if JSON parsing fails
           functionCall = undefined;
         }
+      } else {
+        console.log('\n🔧 No function calls in response');
       }
+      console.log('='.repeat(80));
+      console.log('\n');
 
       return {
         message: message.content || ErrorPrompts.processingMessage.template,

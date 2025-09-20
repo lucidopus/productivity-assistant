@@ -43,28 +43,49 @@ export async function POST(request: NextRequest) {
       throw new Error(`Groq error: ${bellaResponse.error}`);
     }
 
-    // Add Bella's response to session
-    const bellaMessage: ChatMessage = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2)}`,
-      timestamp: new Date(),
-      role: 'assistant',
-      content: bellaResponse.message
-    };
-
-    await chatsCollection.updateOne(
-      { sessionId },
-      {
-        $push: { messages: bellaMessage as any }, // eslint-disable-line @typescript-eslint/no-explicit-any
-        $inc: { iteration: 1 }
-      }
-    );
+    // Process function calls first to potentially modify the message
+    let finalMessage = bellaResponse.message;
 
     // Process function calls if any (for future weekly plan generation)
     if (bellaResponse.functionCall) {
       console.log('Function call detected:', bellaResponse.functionCall.name);
 
       if (bellaResponse.functionCall.name === 'set_continuation_flag') {
-        const flagCall = bellaResponse.functionCall.arguments as { continueConversation: boolean };
+        const flagCall = bellaResponse.functionCall.arguments as {
+          continueConversation: boolean;
+          reason?: string;
+          missingInfo?: string[];
+        };
+
+        // If the LLM didn't provide message content, generate one based on the function call
+        if (!finalMessage || finalMessage === "I'm processing your request...") {
+          // Generate a natural response based on what info is needed
+          if (flagCall.continueConversation && flagCall.missingInfo && flagCall.missingInfo.length > 0) {
+            const questions = flagCall.missingInfo.map((info: string) => {
+              const infoLower = info.toLowerCase();
+
+              // Convert technical descriptions to natural questions
+              if (infoLower.includes('presentation') || infoLower.includes('prep')) {
+                return "How would you like to break down those 6 hours of presentation prep? For example: 2 hours for slide creation, 2 hours for content refinement, 2 hours for practice? And which specific topics will you be covering?";
+              } else if (infoLower.includes('grading') || infoLower.includes('wednesday')) {
+                return "How long do you typically need for your Wednesday grading session? And which assignments will you be grading?";
+              } else if (infoLower.includes('gym') || infoLower.includes('workout')) {
+                return "What type of workouts do you prefer? (cardio, strength training, yoga, swimming?) And when during the day works best - morning, afternoon, or evening?";
+              } else if (infoLower.includes('travel') || infoLower.includes('seminar') || infoLower.includes('location')) {
+                return "Is the department seminar on campus, or will you need travel time? And would you like some buffer time before the presentation to set up and calm your nerves?";
+              } else if (infoLower.includes('meal') || infoLower.includes('cook')) {
+                return "What types of meals are you thinking of preparing? Quick breakfasts, meal prep lunches, or hearty dinners?";
+              }
+              // Return a cleaned version of the original if no match
+              return info;
+            }).filter((q: string) => q && q.length > 0);
+
+            finalMessage = `Great plan! I love that you're balancing your presentation prep with self-care. To create the perfect schedule for you, I need a few more details:\n\n${questions.join('\n\n')}`;
+          } else {
+            finalMessage = flagCall.reason || "Let me gather a bit more information to create the perfect schedule for you.";
+          }
+        }
+
         await chatsCollection.updateOne(
           { sessionId },
           {
@@ -138,9 +159,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Now add Bella's response to session with the final message
+    const bellaMessage: ChatMessage = {
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2)}`,
+      timestamp: new Date(),
+      role: 'assistant',
+      content: finalMessage
+    };
+
+    await chatsCollection.updateOne(
+      { sessionId },
+      {
+        $push: { messages: bellaMessage as any }, // eslint-disable-line @typescript-eslint/no-explicit-any
+        $inc: { iteration: 1 }
+      }
+    );
+
     return NextResponse.json({
       success: true,
-      bellaResponse: bellaResponse.message,
+      bellaResponse: finalMessage,
       sessionId
     });
 

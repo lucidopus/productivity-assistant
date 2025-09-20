@@ -51,10 +51,30 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
                 <MapPin className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 space-y-1">
-                <p className="font-semibold text-foreground">{personal.location || 'Location not specified'}</p>
+                <p className="font-semibold text-foreground">
+                  {(() => {
+                    const location = personal.location;
+                    if (typeof location === 'string') {
+                      return location;
+                    } else if (location && typeof location === 'object') {
+                      const loc = location as { city?: string; country?: string; timezone?: string };
+                      return `${loc.city || ''}, ${loc.country || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Location not specified';
+                    }
+                    return 'Location not specified';
+                  })()}
+                </p>
                 <div className="flex items-center gap-1.5 text-caption">
                   <Globe className="h-3 w-3" />
-                  <span>{personal.timezone || 'Timezone not specified'}</span>
+                  <span>
+                    {(() => {
+                      const location = personal.location;
+                      if (typeof location === 'object' && location) {
+                        const loc = location as { timezone?: string };
+                        return loc.timezone || personal.timezone || 'Timezone not specified';
+                      }
+                      return personal.timezone || 'Timezone not specified';
+                    })()}
+                  </span>
                 </div>
               </div>
             </div>
@@ -77,7 +97,18 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
           <div className="space-y-4 pl-8">
             <div className="space-y-2">
               <span className="text-label font-medium text-muted-foreground">Living Status</span>
-              <p className="text-body text-foreground">{personal.background || 'Background not specified'}</p>
+              <p className="text-body text-foreground">
+                {(() => {
+                  const background = personal.background;
+                  if (typeof background === 'string') {
+                    return background;
+                  } else if (background && typeof background === 'object') {
+                    const bg = background as { livingStatus?: string };
+                    return bg.livingStatus || 'Background not specified';
+                  }
+                  return 'Background not specified';
+                })()}
+              </p>
             </div>
             {false && (
               <div className="space-y-2">
@@ -89,7 +120,9 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
         </motion.div>
 
         {/* Personal Values */}
-        {personal.values && personal.values.length > 0 && (
+        {(() => {
+          const values = personal.values || (personal.background as any)?.personalValues || [];
+          return Array.isArray(values) && values.length > 0 && (
           <motion.div
             className="space-y-4"
             initial={{ opacity: 0, y: 10 }}
@@ -103,7 +136,7 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
               Personal Values
             </h4>
             <div className="flex flex-wrap gap-2 pl-8">
-              {personal.values.map((value, index) => (
+              {values.map((value: string, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -125,7 +158,8 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
               ))}
             </div>
           </motion.div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   )

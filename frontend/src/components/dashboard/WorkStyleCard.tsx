@@ -44,60 +44,69 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
               Focus Duration
             </h4>
             <div className="text-center p-4 rounded-lg bg-secondary">
-              <p className="text-3xl font-bold">{workStyle.productivity?.focusTime || '45'}</p>
+              <p className="text-3xl font-bold">{(workStyle as any).focusDuration || workStyle.productivity?.focusTime || '45'}</p>
               <p className="text-sm text-muted-foreground">minutes of focused work</p>
             </div>
           </div>
 
-          {workStyle.workStyle && workStyle.workStyle.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-medium">Task Preferences</h4>
-              <div className="flex flex-wrap gap-2">
-                {workStyle.workStyle.map((preference, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
-                  >
-                    {preference}
-                  </span>
-                ))}
+          {(() => {
+            const taskPreferences = workStyle.workStyle || (workStyle as any).taskPreferences || [];
+            return taskPreferences.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Task Preferences</h4>
+                <div className="flex flex-wrap gap-2">
+                  {taskPreferences.map((preference: string, index: number) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                    >
+                      {preference}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
-          {false && (
-            <div className="space-y-3">
-              <h4 className="font-medium flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                What Motivates You
-              </h4>
-              <div className="space-y-2">
-                {['Achievement', 'Recognition'].map((motivator, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                    <span className="text-sm">{motivator}</span>
-                  </div>
-                ))}
+          {(() => {
+            const motivators = (workStyle as any).motivators || [];
+            return motivators.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4" />
+                  What Motivates You
+                </h4>
+                <div className="space-y-2">
+                  {motivators.map((motivator: string, index: number) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                      <span className="text-sm">{motivator}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
-          {false && (
-            <div className="space-y-3">
-              <h4 className="font-medium flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Productivity Blockers
-              </h4>
-              <div className="space-y-2">
-                {['Distractions', 'Multitasking'].map((blocker, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
-                    <span className="text-sm">{blocker}</span>
-                  </div>
-                ))}
+          {(() => {
+            const blockers = (workStyle as any).blockers || [];
+            return blockers.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Productivity Blockers
+                </h4>
+                <div className="space-y-2">
+                  {blockers.map((blocker: string, index: number) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
+                      <span className="text-sm">{blocker}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </CardContent>
       </Card>
     </motion.div>

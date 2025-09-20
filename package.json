@@ -11,7 +11,8 @@
     "start": "npm run start --workspace=@productivity-assistant/frontend",
     "lint": "npm run lint --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
-    "install-all": "npm install && npm install --workspaces"
+    "install-all": "npm install && npm install --workspaces",
+    "trigger:dev": "NODE_OPTIONS='--disable-warning=DEP0040' npx trigger.dev@latest dev"
   },
   "devDependencies": {
     "@trigger.dev/build": "^4.0.2",
