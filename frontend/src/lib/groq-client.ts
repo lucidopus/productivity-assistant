@@ -178,8 +178,23 @@ export async function generateBellaResponse(
       console.log('='.repeat(80));
       console.log('\n');
 
+      // Generate intelligent message when LLM provides function call but no content
+      let finalMessage = message.content;
+      if (!finalMessage && functionCall) {
+        if (functionCall.name === 'set_continuation_flag') {
+          const args = functionCall.arguments as { reason?: string };
+          finalMessage = `Great info so far! 😊 Just need a couple more details to create the perfect schedule:\n\n${args.reason || 'Let me gather a bit more information to make sure everything fits perfectly.'}`;
+        } else if (functionCall.name === 'save_weekly_plan') {
+          finalMessage = "Perfect! Let me organize all of this into your weekly plan... 📅";
+        } else {
+          finalMessage = ErrorPrompts.processingMessage.template;
+        }
+      } else if (!finalMessage) {
+        finalMessage = ErrorPrompts.processingMessage.template;
+      }
+
       return {
-        message: message.content || ErrorPrompts.processingMessage.template,
+        message: finalMessage,
         functionCall
       };
 

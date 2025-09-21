@@ -18,6 +18,11 @@ export interface ChatSession {
   createdAt: Date;
   completedAt?: Date;
   weeklyPlanId?: string;
+  // Slack-specific fields
+  slackThreadTs?: string;
+  slackChannelId?: string;
+  slackUserId?: string;
+  assistantThreadId?: string; // Slack Assistant API
 }
 
 export interface TaskItem {
