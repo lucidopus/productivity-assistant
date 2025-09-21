@@ -342,7 +342,7 @@ async function generateFinalPlan(sessionId: string): Promise<void> {
 // Main scheduled task - runs every Sunday at 9 PM
 export const weeklyPlanner = schedules.task({
   id: "weekly-planner",
-  cron: "0 21 * * 0", // Every Sunday at 9 PM (21:00)
+  // cron: "0 21 * * 0", // Every Sunday at 9 PM (21:00) - Configured on dashboard
   maxDuration: 900, // 15 minutes
   run: async () => {
     logger.info("Weekly planner task started", { timestamp: new Date() });

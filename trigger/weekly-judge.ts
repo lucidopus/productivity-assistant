@@ -282,7 +282,7 @@ async function updateAnalysisWithGitHubInfo(
 // Main scheduled task - runs every Saturday at 3 PM
 export const weeklyJudge = schedules.task({
   id: "weekly-judge",
-  cron: "0 15 * * 6", // Every Saturday at 3 PM (15:00)
+  // cron: "35 21 * * 6", // Every Saturday at 9:35 PM (21:35) - Configured on dashboard
   maxDuration: 900, // 15 minutes
   run: async () => {
     logger.info("Weekly judge task started", { timestamp: new Date() });
