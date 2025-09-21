@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getChatsCollection } from '@/lib/mongodb';
-
-const HARDCODED_USER_ID = "68cca41fb015304ecc79c64a";
+import { HARDCODED_USER_ID } from '@/lib/constants';
 
 // POST: Create a test session with initial Bella message
 export async function POST() {

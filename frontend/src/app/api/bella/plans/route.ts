@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWeeklyPlansCollection } from '@/lib/mongodb';
-
-const HARDCODED_USER_ID = "68cca41fb015304ecc79c64a";
+import { HARDCODED_USER_ID } from '@/lib/constants';
 
 // GET: Fetch current active weekly plan
 export async function GET() {

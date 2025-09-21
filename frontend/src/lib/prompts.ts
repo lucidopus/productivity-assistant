@@ -5,6 +5,8 @@
  * Organized by functionality for easy maintenance and consistency.
  */
 
+import { HARDCODED_USER_ID } from './constants';
+
 // ===== TYPES AND INTERFACES =====
 
 export interface PromptTemplate {
@@ -614,7 +616,7 @@ function formatProfileToNaturalLanguage(profile: any): string {
 export function getHardcodedProfile(userId: string): string {
   const temporalContext = generateTemporalContext();
 
-  if (userId === "68cca41fb015304ecc79c64a") {
+  if (userId === HARDCODED_USER_ID) {
     return fillPromptTemplate(UserProfilePrompts.harshilProfile.template, {
       temporalContext
     });

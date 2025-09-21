@@ -38,12 +38,12 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Sunrise className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Wake time:</span>
-                  <span className="font-medium">{(schedule as any).wakeTime || '7:00 AM'}</span>
+                  <span className="font-medium">{(schedule as { wakeTime?: string }).wakeTime || '7:00 AM'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Moon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Sleep time:</span>
-                  <span className="font-medium">{(schedule as any).sleepTime || '11:00 PM'}</span>
+                  <span className="font-medium">{(schedule as { sleepTime?: string }).sleepTime || '11:00 PM'}</span>
                 </div>
               </div>
             </div>
@@ -54,19 +54,19 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Start:</span>
-                  <span className="font-medium">{formatTime(schedule.workingHours?.start || (schedule as any).workHours?.start || '9:00')}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.start || (schedule as { workHours?: { start?: string } }).workHours?.start || '9:00')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">End:</span>
-                  <span className="font-medium">{formatTime(schedule.workingHours?.end || (schedule as any).workHours?.end || '17:00')}</span>
+                  <span className="font-medium">{formatTime(schedule.workingHours?.end || (schedule as { workHours?: { end?: string } }).workHours?.end || '17:00')}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {(() => {
-            const productivePeriods = schedule.timePreferences || (schedule as any).productivePeriods || [];
+            const productivePeriods = schedule.timePreferences || (schedule as { productivePeriods?: string[] }).productivePeriods || [];
             return productivePeriods.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium flex items-center gap-2">
