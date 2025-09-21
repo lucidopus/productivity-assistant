@@ -62,3 +62,16 @@ export async function getErrorLogsCollection() {
   const db = await getDatabase()
   return db.collection('error_logs')
 }
+
+export async function getPromptAnalysesCollection() {
+  const db = await getDatabase()
+  return db.collection('prompt_analyses')
+}
+
+// Create indexes for efficient querying (recommended for production)
+export async function createPromptAnalysesIndexes() {
+  const collection = await getPromptAnalysesCollection()
+  await collection.createIndex({ userId: 1, createdAt: -1 })
+  await collection.createIndex({ weeklyPlanId: 1 })
+  await collection.createIndex({ githubIssueNumber: 1 })
+}

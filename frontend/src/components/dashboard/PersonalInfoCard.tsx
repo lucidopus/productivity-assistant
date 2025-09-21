@@ -121,7 +121,7 @@ export function PersonalInfoCard({ personal }: PersonalInfoCardProps) {
 
         {/* Personal Values */}
         {(() => {
-          const values = personal.values || (personal.background as any)?.personalValues || [];
+          const values = personal.values || (personal.background as { personalValues?: string[] })?.personalValues || [];
           return Array.isArray(values) && values.length > 0 && (
           <motion.div
             className="space-y-4"

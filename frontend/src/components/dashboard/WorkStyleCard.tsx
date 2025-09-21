@@ -44,13 +44,13 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
               Focus Duration
             </h4>
             <div className="text-center p-4 rounded-lg bg-secondary">
-              <p className="text-3xl font-bold">{(workStyle as any).focusDuration || workStyle.productivity?.focusTime || '45'}</p>
+              <p className="text-3xl font-bold">{(workStyle as { focusDuration?: string }).focusDuration || workStyle.productivity?.focusTime || '45'}</p>
               <p className="text-sm text-muted-foreground">minutes of focused work</p>
             </div>
           </div>
 
           {(() => {
-            const taskPreferences = workStyle.workStyle || (workStyle as any).taskPreferences || [];
+            const taskPreferences = workStyle.workStyle || (workStyle as { taskPreferences?: string[] }).taskPreferences || [];
             return taskPreferences.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium">Task Preferences</h4>
@@ -69,7 +69,7 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
           })()}
 
           {(() => {
-            const motivators = (workStyle as any).motivators || [];
+            const motivators = (workStyle as { motivators?: string[] }).motivators || [];
             return motivators.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium flex items-center gap-2">
@@ -89,7 +89,7 @@ export function WorkStyleCard({ workStyle }: WorkStyleCardProps) {
           })()}
 
           {(() => {
-            const blockers = (workStyle as any).blockers || [];
+            const blockers = (workStyle as { blockers?: string[] }).blockers || [];
             return blockers.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium flex items-center gap-2">

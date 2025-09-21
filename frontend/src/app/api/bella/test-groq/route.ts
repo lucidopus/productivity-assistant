@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateBellaResponse, formatChatHistory } from '@/lib/groq-client';
 import { formatUserProfile } from '@/lib/profile-formatter';
+import { HARDCODED_USER_ID } from '@/lib/constants';
 
 // POST: Test Groq integration
 export async function POST() {
@@ -18,7 +19,7 @@ export async function POST() {
       }
     ]);
 
-    const userProfile = await formatUserProfile("68cca41fb015304ecc79c64a");
+    const userProfile = await formatUserProfile(HARDCODED_USER_ID);
 
     const response = await generateBellaResponse(testChatHistory, userProfile);
 

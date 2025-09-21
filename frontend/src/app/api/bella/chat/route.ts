@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getChatsCollection } from '@/lib/mongodb';
 import { ChatMessage } from '@/types/bella';
-
-const HARDCODED_USER_ID = "68cca41fb015304ecc79c64a";
+import { HARDCODED_USER_ID } from '@/lib/constants';
 
 // GET: Fetch chat messages for a session
 export async function GET(request: NextRequest) {

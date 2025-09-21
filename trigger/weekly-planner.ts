@@ -8,9 +8,7 @@ import {
   fillPromptTemplate,
   getHardcodedProfile
 } from "../frontend/src/lib/prompts";
-
-// Hardcoded user ID as specified in the implementation plan
-const HARDCODED_USER_ID = "68cca41fb015304ecc79c64a";
+import { HARDCODED_USER_ID } from "../frontend/src/lib/constants";
 
 // Helper function to generate session ID
 function generateSessionId(): string {
