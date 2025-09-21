@@ -1,82 +1,70 @@
 
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# Dependencies
-node_modules/
-**/node_modules
-.pnp.*
-/.pnp
-
-# Production builds
-build/
-**/build
-dist/
-**/dist
-out/
-**/out/
-/.next/
-**/.next
-**/next/
-
-# Development files
-.turbo
-.vercel
-**/.vercel
-.eslintcache
-
-# Environment variables
-.env*
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# TypeScript
-*.tsbuildinfo
-**/*.tsbuildinfo
-**/next-env.d.ts
-
-# Testing
-coverage/
-**/coverage
-**/jest-coverage
-**/.nyc_output
-
-# Storybook
-storybook-static
-build-storybook
-
-# IDE and editor files
-.DS_Store
-.idea/
-.vscode/
-*.swo
-*.swp
-*~
-*.pem
-
-# Temporary folders
-temp/
-tmp/
-
-# Project-specific folders
-.claude/
-.gemini/
-.mcp.json
-.trigger/
-.trigger.claude/
-docs/
-tasks/
-CLAUDE.md
-
-# Yarn
-.yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.claude/
+.DS_Store
+.env*
+.eslintcache
+.gemini/
+.idea/
+.mcp.json
+.pnp.*
+.pnpm-debug.log*
+.trigger.claude/
+.trigger/
+.turbo
+.vercel
+.vscode/
+.yarn/*
+*.log
+*.pem
+*.swo
+*.swp
+*.tsbuildinfo
+**/.next
+**/.nyc_output
+**/.vercel
+**/*.tsbuildinfo
+**/build
+**/coverage
+**/dist
+**/jest-coverage
+**/next-env.d.ts
+**/next/
+**/node_modules
+**/out/
+*~
+/.next/
+/.pnp
+# Dependencies
+# Development files
+# Environment variables
+# IDE and editor files
+# Logs
+# Production builds
+# Project-specific folders
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Storybook
+# Temporary folders
+# Testing
+# TypeScript
+# Yarn
+build-storybook
+build/
+CLAUDE.md
+coverage/
+dist/
+docs/
+lerna-debug.log*
+logs
+node_modules/
+npm-debug.log*
+out/
+storybook-static
+tasks/
+temp/
+tmp/
+yarn-debug.log*
+yarn-error.log*
