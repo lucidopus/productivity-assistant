@@ -68,10 +68,24 @@ export async function getPromptAnalysesCollection() {
   return db.collection('prompt_analyses')
 }
 
+export async function getDailyConversationsCollection() {
+  const db = await getDatabase()
+  return db.collection('daily_conversations')
+}
+
 // Create indexes for efficient querying (recommended for production)
 export async function createPromptAnalysesIndexes() {
   const collection = await getPromptAnalysesCollection()
   await collection.createIndex({ userId: 1, createdAt: -1 })
   await collection.createIndex({ weeklyPlanId: 1 })
   await collection.createIndex({ githubIssueNumber: 1 })
+}
+
+// Create indexes for daily conversations collection
+export async function createDailyConversationsIndexes() {
+  const collection = await getDailyConversationsCollection()
+  await collection.createIndex({ user_id: 1, timestamp: -1 })
+  await collection.createIndex({ user_id: 1, weekday: 1 })
+  await collection.createIndex({ weekly_plan_id: 1 })
+  await collection.createIndex({ timestamp: -1 })
 }

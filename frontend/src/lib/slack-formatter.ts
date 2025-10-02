@@ -205,3 +205,42 @@ export function formatProcessingMessage(): SlackBlock[] {
     }
   ];
 }
+
+/**
+ * Formats daily assistant responses with tool usage indicators
+ */
+export function formatDailyResponse(message: string, toolsUsed: string[] = []): SlackBlock[] {
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: message
+      }
+    }
+  ];
+
+  if (toolsUsed.length > 0) {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `🔧 _Used: ${toolsUsed.join(', ')}_`
+        }
+      ]
+    });
+  }
+
+  blocks.push({
+    type: "context",
+    elements: [
+      {
+        type: "mrkdwn",
+        text: "📱 _Daily Assistant_"
+      }
+    ]
+  });
+
+  return blocks;
+}

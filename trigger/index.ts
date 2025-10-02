@@ -2,3 +2,4 @@
 export * from "./weekly-planner";
 export * from "./weekly-judge";
 export * from "./slack-bella-planner";
+export * from "./daily-assistant-trigger";

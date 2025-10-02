@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { processUserMessage, handleFunctionCall } from '@/lib/bella-slack-handler';
-import { formatBellaResponse, formatWeeklyPlan } from '@/lib/slack-formatter';
+import { formatBellaResponse, formatWeeklyPlan, formatDailyResponse } from '@/lib/slack-formatter';
+import { shouldUseDailyAssistant } from '@/lib/daily-langchain-agent';
+import { HARDCODED_USER_ID } from '@/lib/constants';
 import { WebClient } from '@slack/web-api';
 import { SaveWeeklyPlanCall } from '@/types/bella';
 
@@ -79,62 +81,101 @@ export async function POST(request: NextRequest) {
         try {
           console.log('Processing user message:', payload.event.text);
 
-          // Process through Bella conversation handler
-          const response = await processUserMessage(
-            {
-              text: payload.event.text,
-              channel: payload.event.channel,
-              user: payload.event.user,
-              ts: payload.event.ts
-            },
-            {
-              channelId: payload.event.channel,
-              userId: payload.event.user
-            }
-          );
+          // Determine which assistant should handle this message
+          const messageTimestamp = new Date(parseInt(payload.event.ts) * 1000);
+          const useDailyAssistant = shouldUseDailyAssistant(payload.event.text, messageTimestamp);
 
-          console.log('Bella response generated:', response.message);
+          console.log('Routing decision:', {
+            useDailyAssistant,
+            timestamp: messageTimestamp.toISOString(),
+            messagePreview: payload.event.text.substring(0, 50)
+          });
 
-          // Send message to Slack if there's actual content (excluding processing message)
-          if (response.message && response.message !== "I'm processing your request...") {
-            await slackClient.chat.postMessage({
-              channel: payload.event.channel,
-              blocks: formatBellaResponse(response.message),
-              text: response.message // Fallback text
-            });
-          }
+          if (useDailyAssistant) {
+            // Route to daily assistant
+            console.log('Routing to daily assistant');
 
-          // Handle function calls (continuation/plan saving)
-          if (response.functionCall) {
-            console.log('Handling function call:', response.functionCall.name);
-
-            await handleFunctionCall({
-              name: response.functionCall.name,
-              arguments: response.functionCall.arguments as unknown as Record<string, unknown>
-            }, {
-              channelId: payload.event.channel,
-              userId: payload.event.user
+            const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3007'}/api/daily-assistant`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: payload.event.text,
+                userId: HARDCODED_USER_ID
+              })
             });
 
-            // If it's a weekly plan save, format and send the plan
-            if (response.functionCall.name === 'save_weekly_plan') {
-              const weeklyPlan = {
-                weeklyTargets: (response.functionCall.arguments as SaveWeeklyPlanCall).weeklyTargets,
-                days: (response.functionCall.arguments as SaveWeeklyPlanCall).days,
-                weekStart: new Date(),
-                weekEnd: new Date(),
-                userId: payload.event.user,
-                sessionId: '',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                status: 'active' as const
-              };
+            const result = await response.json();
 
+            if (result.success) {
               await slackClient.chat.postMessage({
                 channel: payload.event.channel,
-                blocks: formatWeeklyPlan(weeklyPlan),
-                text: "Your weekly plan is ready!"
+                blocks: formatDailyResponse(result.message, result.tools_used),
+                text: result.message
               });
+            } else {
+              throw new Error(`Daily assistant error: ${result.error}`);
+            }
+
+          } else {
+            // Route to weekly planning (Bella)
+            console.log('Routing to weekly planner (Bella)');
+
+            const response = await processUserMessage(
+              {
+                text: payload.event.text,
+                channel: payload.event.channel,
+                user: payload.event.user,
+                ts: payload.event.ts
+              },
+              {
+                channelId: payload.event.channel,
+                userId: payload.event.user
+              }
+            );
+
+            console.log('Bella response generated:', response.message);
+
+            // Send message to Slack if there's actual content (excluding processing message)
+            if (response.message && response.message !== "I'm processing your request...") {
+              await slackClient.chat.postMessage({
+                channel: payload.event.channel,
+                blocks: formatBellaResponse(response.message),
+                text: response.message // Fallback text
+              });
+            }
+
+            // Handle function calls (continuation/plan saving)
+            if (response.functionCall) {
+              console.log('Handling function call:', response.functionCall.name);
+
+              await handleFunctionCall({
+                name: response.functionCall.name,
+                arguments: response.functionCall.arguments as unknown as Record<string, unknown>
+              }, {
+                channelId: payload.event.channel,
+                userId: payload.event.user
+              });
+
+              // If it's a weekly plan save, format and send the plan
+              if (response.functionCall.name === 'save_weekly_plan') {
+                const weeklyPlan = {
+                  weeklyTargets: (response.functionCall.arguments as SaveWeeklyPlanCall).weeklyTargets,
+                  days: (response.functionCall.arguments as SaveWeeklyPlanCall).days,
+                  weekStart: new Date(),
+                  weekEnd: new Date(),
+                  userId: payload.event.user,
+                  sessionId: '',
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  status: 'active' as const
+                };
+
+                await slackClient.chat.postMessage({
+                  channel: payload.event.channel,
+                  blocks: formatWeeklyPlan(weeklyPlan),
+                  text: "Your weekly plan is ready!"
+                });
+              }
             }
           }
 
